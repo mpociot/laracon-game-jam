@@ -369,4 +369,152 @@ export default class GameScene extends Phaser.Scene {
         // Update physics world bounds
         this.physics.world.setBounds(0, 0, this.worldWidth, this.worldHeight);
     }
+    
+    showGameOver() {
+        // Pause the game
+        this.scene.pause();
+        
+        // Get camera dimensions
+        const { width, height } = this.scale;
+        
+        // Create semi-transparent overlay that covers the entire screen
+        const overlay = this.add.rectangle(
+            width / 2,
+            height / 2,
+            width,
+            height,
+            0x000000,
+            0.7
+        );
+        overlay.setScrollFactor(0);
+        overlay.setDepth(1000);
+        
+        // Game over title
+        const gameOverText = this.add.text(
+            width / 2,
+            height / 2 - 100,
+            '500 Server Error',
+            {
+                fontFamily: 'monospace',
+                fontSize: '48px',
+                color: '#ff0000',
+                align: 'center'
+            }
+        );
+        gameOverText.setOrigin(0.5);
+        gameOverText.setScrollFactor(0);
+        gameOverText.setDepth(1001);
+        
+        // Subtitle
+        const subtitleText = this.add.text(
+            width / 2,
+            height / 2 - 40,
+            'Ship Not Found',
+            {
+                fontFamily: 'monospace',
+                fontSize: '24px',
+                color: '#ffffff',
+                align: 'center'
+            }
+        );
+        subtitleText.setOrigin(0.5);
+        subtitleText.setScrollFactor(0);
+        subtitleText.setDepth(1001);
+        
+        // Score text
+        const scoreText = this.add.text(
+            width / 2,
+            height / 2 + 20,
+            `Final Score: ${this.score}`,
+            {
+                fontFamily: 'monospace',
+                fontSize: '32px',
+                color: '#00ff00',
+                align: 'center'
+            }
+        );
+        scoreText.setOrigin(0.5);
+        scoreText.setScrollFactor(0);
+        scoreText.setDepth(1001);
+        
+        // Restart button background
+        const buttonBg = this.add.rectangle(
+            width / 2,
+            height / 2 + 100,
+            200,
+            50,
+            0x4CAF50
+        );
+        buttonBg.setScrollFactor(0);
+        buttonBg.setDepth(1001);
+        buttonBg.setInteractive({ useHandCursor: true });
+        
+        // Restart button text
+        const restartText = this.add.text(
+            width / 2,
+            height / 2 + 100,
+            'RESTART',
+            {
+                fontFamily: 'monospace',
+                fontSize: '24px',
+                color: '#ffffff',
+                align: 'center'
+            }
+        );
+        restartText.setOrigin(0.5);
+        restartText.setScrollFactor(0);
+        restartText.setDepth(1002);
+        
+        // Button hover effect
+        buttonBg.on('pointerover', () => {
+            buttonBg.setFillStyle(0x45a049);
+            restartText.setScale(1.1);
+        });
+        
+        buttonBg.on('pointerout', () => {
+            buttonBg.setFillStyle(0x4CAF50);
+            restartText.setScale(1);
+        });
+        
+        // Button click handler
+        buttonBg.on('pointerdown', () => {
+            location.reload();
+        });
+        
+        // Add some animation to the texts
+        this.tweens.add({
+            targets: gameOverText,
+            scale: { from: 0, to: 1 },
+            alpha: { from: 0, to: 1 },
+            duration: 500,
+            ease: 'Power2'
+        });
+        
+        this.tweens.add({
+            targets: subtitleText,
+            scale: { from: 0, to: 1 },
+            alpha: { from: 0, to: 1 },
+            duration: 500,
+            delay: 200,
+            ease: 'Power2'
+        });
+        
+        this.tweens.add({
+            targets: scoreText,
+            scale: { from: 0, to: 1 },
+            alpha: { from: 0, to: 1 },
+            duration: 500,
+            delay: 400,
+            ease: 'Power2'
+        });
+        
+        this.tweens.add({
+            targets: [buttonBg, restartText],
+            scale: { from: 0, to: 1 },
+            alpha: { from: 0, to: 1 },
+            duration: 500,
+            delay: 600,
+            ease: 'Back.easeOut'
+        });
+    }
 }

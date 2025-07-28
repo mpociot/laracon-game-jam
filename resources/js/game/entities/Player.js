@@ -13,6 +13,7 @@ export default class Player {
         
         // Player stats
         this.health = 100;
+        this.maxHealth = 100;
         this.maxSpeed = 150;
         this.currentSpeed = 0;
         this.acceleration = 5;
@@ -29,6 +30,13 @@ export default class Player {
         
         // Facing direction (in radians, 0 = right, PI = left)
         this.facingDirection = Math.PI; // Start facing left
+        
+        // Health bar
+        this.createHealthBar();
+        
+        // Smoke particles for low health
+        this.smokeEmitter = null;
+        this.lastSmokeTime = 0;
     }
     
     update(cursors, mobileInput = { x: 0, y: 0 }) {
@@ -96,6 +104,12 @@ export default class Player {
                 this.createBoostParticle();
             }
         }
+        
+        // Update health bar position
+        this.updateHealthBar();
+        
+        // Update low health effects
+        this.updateLowHealthEffects();
     }
     
     boost() {
@@ -119,7 +133,7 @@ export default class Player {
         // Flash red
         this.sprite.setTint(0xff0000);
         this.scene.time.delayedCall(200, () => {
-            this.sprite.clearTint();
+            this.updateHealthTint();
         });
         
         // Check if dead
@@ -138,6 +152,10 @@ export default class Player {
     }
     
     die() {
+        // Hide health bar
+        this.healthBarBg.setVisible(false);
+        this.healthBarFill.setVisible(false);
+        
         // Death animation
         this.scene.tweens.add({
             targets: this.sprite,
@@ -146,10 +164,8 @@ export default class Player {
             rotation: this.sprite.rotation + Math.PI * 2,
             duration: 1000,
             onComplete: () => {
-                // Show game over
-                this.scene.scene.pause();
-                alert('500 Server Error - Ship Not Found\n\nScore: ' + this.scene.score);
-                location.reload();
+                // Show game over screen
+                this.scene.showGameOver();
             }
         });
     }
@@ -199,5 +215,103 @@ export default class Player {
                 onComplete: () => particle.destroy()
             });
         }
+    }
+    
+    createHealthBar() {
+        // Health bar background
+        this.healthBarBg = this.scene.add.rectangle(
+            this.sprite.x,
+            this.sprite.y + 40,
+            60,
+            8,
+            0x333333
+        );
+        this.healthBarBg.setStrokeStyle(2, 0x000000);
+        
+        // Health bar fill
+        this.healthBarFill = this.scene.add.rectangle(
+            this.sprite.x,
+            this.sprite.y + 40,
+            60,
+            8,
+            0x00ff00
+        );
+        
+        // Make health bar follow player
+        this.healthBarBg.setDepth(10);
+        this.healthBarFill.setDepth(11);
+    }
+    
+    updateHealthBar() {
+        const healthPercent = this.health / this.maxHealth;
+        const barWidth = 60 * healthPercent;
+        
+        // Update position
+        this.healthBarBg.x = this.sprite.x;
+        this.healthBarBg.y = this.sprite.y + 40;
+        this.healthBarFill.x = this.sprite.x - (60 - barWidth) / 2;
+        this.healthBarFill.y = this.sprite.y + 40;
+        
+        // Update width
+        this.healthBarFill.width = barWidth;
+        
+        // Update color based on health
+        if (healthPercent > 0.6) {
+            this.healthBarFill.setFillStyle(0x00ff00); // Green
+        } else if (healthPercent > 0.3) {
+            this.healthBarFill.setFillStyle(0xffff00); // Yellow
+        } else {
+            this.healthBarFill.setFillStyle(0xff0000); // Red
+        }
+    }
+    
+    updateHealthTint() {
+        const healthPercent = this.health / this.maxHealth;
+        
+        if (healthPercent < 0.3) {
+            // Low health - red tint
+            this.sprite.setTint(0xff8888);
+        } else if (healthPercent < 0.5) {
+            // Medium health - slight red tint
+            this.sprite.setTint(0xffcccc);
+        } else {
+            // Good health - no tint
+            this.sprite.clearTint();
+        }
+    }
+    
+    updateLowHealthEffects() {
+        const healthPercent = this.health / this.maxHealth;
+        const currentTime = this.scene.time.now;
+        
+        // Create smoke particles when health is low
+        if (healthPercent < 0.3 && currentTime - this.lastSmokeTime > 200) {
+            this.createSmokeParticle();
+            this.lastSmokeTime = currentTime;
+        }
+    }
+    
+    createSmokeParticle() {
+        // Create smoke particle at random position near the ship
+        const offsetX = Phaser.Math.Between(-20, 20);
+        const offsetY = Phaser.Math.Between(-20, 20);
+        
+        const smoke = this.scene.add.circle(
+            this.sprite.x + offsetX,
+            this.sprite.y + offsetY,
+            Phaser.Math.Between(5, 10),
+            0x666666
+        );
+        smoke.setAlpha(0.7);
+        
+        // Animate smoke rising and fading
+        this.scene.tweens.add({
+            targets: smoke,
+            y: smoke.y - 30,
+            alpha: 0,
+            scale: 1.5,
+            duration: 1000,
+            onComplete: () => smoke.destroy()
+        });
     }
 }
