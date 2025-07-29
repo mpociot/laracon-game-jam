@@ -56,6 +56,7 @@
             text-align: center;
             border: 3px solid #fff;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            max-width: 500px;
         }
         
         .name-modal-content h2 {
@@ -259,6 +260,17 @@
         <div class="name-modal-content">
             <h2>Enter Your Name</h2>
             <input type="text" id="player-name" class="name-input" placeholder="Captain..." maxlength="20" autocomplete="off">
+            
+            <div style="margin: 20px 0; padding: 20px; background: rgba(0,0,0,0.3); border-radius: 5px;">
+                <h3 style="color: #ffff00; font-size: 16px; margin-bottom: 15px; font-family: 'Press Start 2P', cursive;">How to Play:</h3>
+                <div style="text-align: left; color: white; font-family: 'Press Start 2P', cursive; font-size: 10px; line-height: 1.8;">
+                    <p style="margin-bottom: 10px;">🎯 Shoot enemy ships: <span style="color: #00ff00;">+50 points</span></p>
+                    <p style="margin-bottom: 10px;">🌊 Collect waves: <span style="color: #00ff00;">+25 points</span> & speed boost</p>
+                    <p style="margin-bottom: 10px;">⌨️ Use arrow keys to move</p>
+                    <p>🔫 Press space to fire cannons</p>
+                </div>
+            </div>
+            
             <button id="start-game" class="name-submit" disabled>Set Sail!</button>
         </div>
     </div>
