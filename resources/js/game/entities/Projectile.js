@@ -1,11 +1,15 @@
 import Phaser from 'phaser';
 
 export default class Projectile extends Phaser.GameObjects.Container {
-    constructor(scene, x, y, rotation) {
+    constructor(scene, x, y, rotation, shooterId = null, shooterName = null) {
         super(scene, x, y);
         
         // Store scene reference
         this.gameScene = scene;
+        
+        // Store shooter info
+        this.shooterId = shooterId;
+        this.shooterName = shooterName;
         
         // Create text object for dd("Sink")
         this.text = scene.add.text(0, 0, 'dd("Sink")', {

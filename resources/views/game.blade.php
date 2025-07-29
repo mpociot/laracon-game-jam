@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>The Artisan Armada - Play</title>
     @vite(['resources/css/app.css', 'resources/js/game/game.js'])
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
@@ -32,6 +33,77 @@
             justify-content: center;
             align-items: center;
             background: linear-gradient(to bottom, #87CEEB 0%, #1E90FF 50%, #000080 100%);
+        }
+        
+        /* Name Input Modal */
+        #name-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .name-modal-content {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 40px;
+            border-radius: 10px;
+            text-align: center;
+            border: 3px solid #fff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        .name-modal-content h2 {
+            color: white;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+        }
+        
+        .name-input {
+            width: 300px;
+            padding: 15px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 16px;
+            border: 3px solid #fff;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.9);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .name-submit {
+            background: #4CAF50;
+            color: white;
+            padding: 15px 30px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 14px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 0 #2e7d32;
+        }
+        
+        .name-submit:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #2e7d32;
+        }
+        
+        .name-submit:active:not(:disabled) {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #2e7d32;
+        }
+        
+        .name-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
         
         #phaser-game {
@@ -182,8 +254,17 @@
     </style>
 </head>
 <body>
+    <!-- Name Input Modal -->
+    <div id="name-modal">
+        <div class="name-modal-content">
+            <h2>Enter Your Name</h2>
+            <input type="text" id="player-name" class="name-input" placeholder="Captain..." maxlength="20" autocomplete="off">
+            <button id="start-game" class="name-submit" disabled>Set Sail!</button>
+        </div>
+    </div>
+    
     <div id="game-container">
-        <div class="loading" id="loading">
+        <div class="loading" id="loading" style="display: none;">
             <div>Running migrations...</div>
             <div style="font-size: 12px; margin-top: 20px;">Loading game assets</div>
         </div>
@@ -196,6 +277,14 @@
         </div>
         
         <a href="/" class="back-button">Exit Game</a>
+        
+        <!-- Leaderboard -->
+        <div class="absolute top-20 right-5 bg-black/70 border-2 border-white rounded-lg p-4 font-['Press_Start_2P'] text-white shadow-lg z-50 min-w-[250px]" id="leaderboard" style="display: none; text-shadow: 2px 2px 0 rgba(0,0,0,0.5);">
+            <h3 class="text-sm mb-3 text-center text-yellow-300">Leaderboard</h3>
+            <div id="leaderboard-list">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
         
         <div id="phaser-game"></div>
         
